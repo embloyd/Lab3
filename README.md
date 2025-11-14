@@ -310,3 +310,307 @@ public class Secret {
 Измените сущность Дробь, полученную в задаче 2.1.4. Гарантируйте, что невозможно создать 
 такой подвид дроби, который позволял бы создавать Дроби с изменяемым состоянием.
 ### Алгоритм решения
+```java
+package lab3;
+public final class Fraction {
+    private final int numerator; //неизменяемость
+    private final int denominator;
+
+    public Fraction(int numerator, int denominator) {
+        if (denominator == 0) {
+            throw new IllegalArgumentException("Знаменатель не может быть 0");
+        }
+        // если знаменатель отрицательный, переносим минус в числитель
+        if (denominator < 0) {
+            numerator = -numerator;
+            denominator = -denominator;
+        }
+        int gcd = gcd(Math.abs(numerator), Math.abs(denominator));
+        this.numerator = numerator / gcd;
+        this.denominator = denominator / gcd;
+    }
+
+    public final int getNumerator() {
+        return numerator;
+    }
+
+    public final int getDenominator() {
+        return denominator;
+    }
+
+    // НОД
+
+    private final int gcd(int a, int b) {
+        while (b != 0) {
+            int t = b;
+            b = a % b;
+            a = t;
+        }
+        return a;
+    }
+
+    @Override
+    public final String toString() {
+        return numerator + "/" + denominator;
+    }
+
+    //операции с другой дробью (возвращают новые объекты)
+    public final Fraction add(Fraction other) {
+        int num = this.numerator * other.denominator + other.numerator * this.denominator;
+        int den = this.denominator * other.denominator;
+        return new Fraction(num, den);
+    }
+
+    public final Fraction subtract(Fraction other) {
+        int num = this.numerator * other.denominator - other.numerator * this.denominator;
+        int den = this.denominator * other.denominator;
+        return new Fraction(num, den);
+    }
+
+    public final Fraction multiply(Fraction other) {
+        int num = this.numerator * other.numerator;
+        int den = this.denominator * other.denominator;
+        return new Fraction(num, den);
+    }
+
+    public final Fraction divide(Fraction other) {
+        if (other.numerator == 0) {
+            throw new ArithmeticException("Деление на ноль");
+        }
+        int num = this.numerator * other.denominator;
+        int den = this.denominator * other.numerator;
+        return new Fraction(num, den);
+    }
+
+    //Операции с целыми числами
+    public final Fraction add(int n) {
+        return add(new Fraction(n, 1));
+    }
+
+    public final Fraction subtract(int n) {
+        return subtract(new Fraction(n, 1));
+    }
+
+    public final Fraction multiply(int n) {
+        return multiply(new Fraction(n, 1));
+    }
+
+    public final Fraction divide(int n) {
+        if (n == 0) {
+            throw new ArithmeticException("Деление на ноль");
+        }
+        return divide(new Fraction(n, 1));
+    }
+
+    @Override
+    public final boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false; 
+        Fraction fraction = (Fraction) obj;
+        return numerator == fraction.numerator && denominator == fraction.denominator;
+    }
+
+    @Override
+    public final int hashCode() {
+        return 37 * numerator + denominator;
+    }
+}
+```
+
+# Задание 4
+## Задача 2
+### Текст задачи
+Измените сущность Дробь, полученную в задаче 2.3.1. Дробь должна быть подтипом класса 
+Number. Данный класс входит в стандартную редакцию языка Java.
+### Алгоритм решения
+```java
+package lab3;
+
+public final class Fraction extends Number {
+    private final int numerator;
+    private final int denominator;
+
+    public Fraction(int numerator, int denominator) {
+        if (denominator == 0) {
+            throw new IllegalArgumentException("Знаменатель не может быть 0");
+        }
+
+        if (denominator < 0) {
+            numerator = -numerator;
+            denominator = -denominator;
+        }
+
+        int gcd = gcd(Math.abs(numerator), Math.abs(denominator));
+        this.numerator = numerator / gcd;
+        this.denominator = denominator / gcd;
+    }
+
+    //реализация абстрактных методов класса Number
+    @Override
+    public int intValue() {
+        return numerator / denominator;  // целая часть
+    }
+
+    @Override
+    public long longValue() {
+        return (long) numerator / denominator; //целая для больших чисел
+    }
+
+    @Override
+    public float floatValue() {
+        return (float) numerator / denominator; // дробная часть с обычной точностью
+    }
+
+    @Override
+    public double doubleValue() {
+        return (double) numerator / denominator; // дробная часть с высокой точностью
+    }
+
+    //геттеры
+    public final int getNumerator() {
+        return numerator;
+    }
+
+    public final int getDenominator() {
+        return denominator;
+    }
+
+    // НОД
+    private final int gcd(int a, int b) {
+        while (b != 0) {
+            int t = b;
+            b = a % b;
+            a = t;
+        }
+        return a;
+    }
+
+    @Override
+    public final String toString() {
+        return numerator + "/" + denominator;
+    }
+
+    // Все остальные методы остаются без изменений
+    public final Fraction add(Fraction other) {
+        int num = this.numerator * other.denominator + other.numerator * this.denominator;
+        int den = this.denominator * other.denominator;
+        return new Fraction(num, den);
+    }
+
+    public final Fraction subtract(Fraction other) {
+        int num = this.numerator * other.denominator - other.numerator * this.denominator;
+        int den = this.denominator * other.denominator;
+        return new Fraction(num, den);
+    }
+
+    public final Fraction multiply(Fraction other) {
+        int num = this.numerator * other.numerator;
+        int den = this.denominator * other.denominator;
+        return new Fraction(num, den);
+    }
+
+    public final Fraction divide(Fraction other) {
+        if (other.numerator == 0) {
+            throw new ArithmeticException("Деление на ноль");
+        }
+        int num = this.numerator * other.denominator;
+        int den = this.denominator * other.numerator;
+        return new Fraction(num, den);
+    }
+
+    public final Fraction add(int n) {
+        return add(new Fraction(n, 1));
+    }
+
+    public final Fraction subtract(int n) {
+        return subtract(new Fraction(n, 1));
+    }
+
+    public final Fraction multiply(int n) {
+        return multiply(new Fraction(n, 1));
+    }
+
+    public final Fraction divide(int n) {
+        if (n == 0) {
+            throw new ArithmeticException("Деление на ноль");
+        }
+        return divide(new Fraction(n, 1));
+    }
+
+    @Override
+    public final boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Fraction fraction = (Fraction) obj;
+        return numerator == fraction.numerator && denominator == fraction.denominator;
+    }
+
+    @Override
+    public final int hashCode() {
+        return 31 * numerator + denominator;
+    }
+}
+```
+
+# Задание 5
+## Задача 1
+### Текст задачи
+Разработайте метод, который принимает набор числовых значенийи возвращает их сумму в 
+вещественной форме. С использованием данного метода выполните следующие сложения: 
+• 2 + 3/5 + 2.3 
+• 3.6 + 49/12 + 3 + 3/2 
+• 1/3 + 1 
+### Алгоритм решения
+Использовала готовый класс Fraction.java из задания 4 и прописала в Main.
+```java
+        System.out.println("---Задание 5: Полиморфизм и сложение---");
+
+        //демонстрация примеров
+        try {
+            System.out.println("Пример 1: 2 + 3/5 + 2.3");
+            System.out.println("Введите дробь:");
+            int num1 = readInt(sc, "Числитель: ");
+            int den1 = readNonZeroInt(sc, "Знаменатель: ");
+            Fraction f1 = new Fraction(num1, den1);
+
+            double result1 = sum(2, f1, 2.3);
+            System.out.println("2 + " + f1 + " + 2.3 = " + result1);
+
+            System.out.println("Пример 2: 3.6 + 49/12 + 3 + 3/2");
+            System.out.println("Введите дробь:");
+            int num2 = readInt(sc, "Числитель: ");
+            int den2 = readNonZeroInt(sc, "Знаменатель: ");
+            Fraction f2 = new Fraction(num2, den2);
+
+            System.out.println("Введите дробь:");
+            int num3 = readInt(sc, "Числитель: ");
+            int den3 = readNonZeroInt(sc, "Знаменатель: ");
+            Fraction f3 = new Fraction(num3, den3);
+
+            double result2 = sum(3.6, f2, 3, f3);
+            System.out.println("3.6 + " + f2 + " + 3 + " + f3 + " = " + result2);
+
+            System.out.println("Пример 3: 1/3 + 1");
+            System.out.println("Введите дробь:");
+            int num4 = readInt(sc, "Числитель: ");
+            int den4 = readNonZeroInt(sc, "Знаменатель: ");
+            Fraction f4 = new Fraction(num4, den4);
+
+            double result3 = sum(f4, 1);
+            System.out.println(f4 + " + 1 = " + result3);
+
+        } catch (Exception e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+
+        sc.close();
+```
+
+# Задание 6
+## Задача 1
+### Текст задачи
+Измените сущность Дробь из задачи 2.4.2. Переопределите метод сравнения объектов по 
+состоянию таким образом, чтобы две дроби считались одинаковыми тогда, когда у них 
+одинаковые значения числителя и знаменателя.
+### Алгоритм решения
+Уже реализовано в задании 4.
